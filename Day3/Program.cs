@@ -6,7 +6,7 @@ int First(string[] input)
 {
     var symbols = GetAllPointOfInterests(input, x => !char.IsDigit(x) && x != '.');
     var numbers = GetAllNumbers(input);
-    
+
     foreach (var symbol in symbols)
     {
         foreach (var number in numbers)
@@ -15,36 +15,36 @@ int First(string[] input)
                 symbol.AdjacentNumbers.Add(number.Value);
         }
     }
-    
+
     return symbols.Select(x => x.SymbolValue).Sum();
 }
 
 int Second(string[] input)
 {
-    var gears = GetAllPointOfInterests(input, x => x == '*'); 
+    var gears = GetAllPointOfInterests(input, x => x == '*');
     var numbers = GetAllNumbers(input);
-    
+
     foreach (var gear in gears)
     {
         foreach (var number in numbers)
         {
-           if (number.X.Any(x => gear.IsAdjacentToCell(x, number.Y)))
-               gear.AdjacentNumbers.Add(number.Value);
+            if (number.X.Any(x => gear.IsAdjacentToCell(x, number.Y)))
+                gear.AdjacentNumbers.Add(number.Value);
         }
     }
-    
+
     return gears.Where(x => x.IsValidGear).Select(x => x.GearValue).Sum();
 }
 
 List<PointOfInterest> GetAllPointOfInterests(string[] input, Predicate<char> predicate)
 {
     var gears = new List<PointOfInterest>();
-    
+
     foreach (var (line, y) in input.Select((l, y) => (l, y)))
     {
         foreach (var (element, x) in line.Select((e, x) => (e, x)))
         {
-            if (predicate.Invoke(element)) gears.Add(new PointOfInterest{X = x, Y = y});
+            if (predicate.Invoke(element)) gears.Add(new PointOfInterest {X = x, Y = y});
         }
     }
 
@@ -90,17 +90,15 @@ List<Number> GetAllNumbers(string[] input)
 
 internal class PointOfInterest
 {
-    public int X { get; set;  }
+    public int X { get; set; }
     public int Y { get; set; }
-    public List<int> AdjacentNumbers { get; } = new ();
+    public List<int> AdjacentNumbers { get; } = new();
     public bool IsValidGear => AdjacentNumbers.Count == 2;
     public int GearValue => AdjacentNumbers.Aggregate((sum, val) => sum * val);
     public int SymbolValue => AdjacentNumbers.Sum();
     public bool IsAdjacentToCell(int x, int y) => Math.Abs(X - x) <= 1 && Math.Abs(Y - y) <= 1;
 }
-internal record struct Number(int Y, List<int> X, int Value) { }
 
-
-
-
-
+internal record struct Number(int Y, List<int> X, int Value)
+{
+}
