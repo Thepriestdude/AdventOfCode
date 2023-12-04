@@ -1,0 +1,1 @@
+﻿Console.WriteLine("--- Day 4: Scratchcards ---");
