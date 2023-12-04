@@ -4,7 +4,7 @@ Console.WriteLine("First: " + First(inputFileContent) + "(<<559667>>)");
 int First(string[] input)
 {
     var numberHits = new List<int>();
-    var hitMatrix = CalculateHitMatrix(input);
+    var hitMatrix = CalculateHitMatrix(input, x => !char.IsDigit(x) && x != '.');
     
     foreach (var (line, y) in input.Select((line, y) => (line, y)))
     {
@@ -40,7 +40,7 @@ void ProcessLine(string s, bool[,] hitMatrix, int y, List<int> numberHits)
     if (potentialNumberIndex.Any(i => hitMatrix[i, y])) numberHits.Add(int.Parse(potentialNumber));
 }
 
-bool[,] CalculateHitMatrix(string[] schematics)
+bool[,] CalculateHitMatrix(string[] schematics, Predicate<char> predicate)
 {
     var symbolHits = new bool[schematics[0].Length, schematics.Length];
     
@@ -48,7 +48,7 @@ bool[,] CalculateHitMatrix(string[] schematics)
     {
         foreach (var element in line.Select((element, x) => (element, x)))
         {
-            if (!char.IsDigit(element.element) && element.element != '.')
+            if (predicate(element.element))
             {
                SetHitsAroundCharacter(symbolHits, element.x, y);
             }
