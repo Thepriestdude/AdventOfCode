@@ -1,97 +1,71 @@
 ﻿var inputFileContent = File.ReadAllLines("Input.txt");
-Console.WriteLine("First: " + First(inputFileContent));
+Console.WriteLine("First: " + First(inputFileContent) + "(<<559667>>)");
 
 int First(string[] input)
 {
     var numberHits = new List<int>();
-    var hitMatrix = GetHitMatrix(input);
+    var hitMatrix = CalculateHitMatrix(input);
     
-    foreach (var line in input.Select((line, y) => (line, y)))
+    foreach (var (line, y) in input.Select((line, y) => (line, y)))
     {
-        var potentialNumberIndex = new List<int>();
-        var potentialNumber = "";
-        foreach (var element in line.line.Select((element, x) => (element, x)))
-        {
-            if (char.IsDigit(element.element))
-            {
-                potentialNumberIndex.Add(element.x);
-                potentialNumber += element.element;
-            }
-            else
-            {
-                if (!string.IsNullOrEmpty(potentialNumber))
-                {
-                    foreach (var i in potentialNumberIndex)
-                    {
-                        if (hitMatrix[i, line.y])
-                        {
-                            numberHits.Add(int.Parse(potentialNumber));
-                            break;
-                        }
-                    }
-                    potentialNumberIndex.Clear();
-                    potentialNumber = "";
-                } 
-            }
-        }
-        if (!string.IsNullOrEmpty(potentialNumber))
-        {
-            foreach (var i in potentialNumberIndex)
-            {
-                if (hitMatrix[i, line.y])
-                {
-                    numberHits.Add(int.Parse(potentialNumber));
-                    break;
-                }
-            }
-            potentialNumberIndex.Clear();
-            potentialNumber = "";
-        }
+        ProcessLine(line, hitMatrix, y, numberHits);
     }
     
     return numberHits.Sum();
 }
 
-
-//MatrixConsoleWrite(hitMatrix);
-
-void MatrixConsoleWrite(bool[,] matrix)
+void ProcessLine(string s, bool[,] hitMatrix, int y, List<int> numberHits)
 {
-    for (int y = 0; y < matrix.GetLength(1); y++)
+    var potentialNumberIndex = new List<int>();
+    var potentialNumber = "";
+    
+    foreach (var element in s.Select((element, x) => (element, x)))
     {
-        for (int x = 0; x < matrix.GetLength(0); x++)
+        if (char.IsDigit(element.element))
         {
-            Console.Write(matrix[x, y] ? '#' : '.');
+            potentialNumberIndex.Add(element.x);
+            potentialNumber += element.element;
         }
-        Console.WriteLine();
+        else
+        {
+            if (string.IsNullOrEmpty(potentialNumber)) continue;
+            if (potentialNumberIndex.Any(i => hitMatrix[i, y])) numberHits.Add(int.Parse(potentialNumber));
+
+            potentialNumberIndex.Clear();
+            potentialNumber = "";
+        }
     }
+
+    if (string.IsNullOrEmpty(potentialNumber)) return;
+    if (potentialNumberIndex.Any(i => hitMatrix[i, y])) numberHits.Add(int.Parse(potentialNumber));
 }
 
-bool[,] GetHitMatrix(string[] schemantics)
+bool[,] CalculateHitMatrix(string[] schematics)
 {
-    var symbolHits = new bool[schemantics[0].Length, schemantics.Length];
+    var symbolHits = new bool[schematics[0].Length, schematics.Length];
     
-    foreach(var line in schemantics.Select((line, y) => (line, y)))
+    foreach(var (line, y) in schematics.Select((line, y) => (line, y)))
     {
-        foreach (var element in line.line.Select((element, x) => (element, x)))
+        foreach (var element in line.Select((element, x) => (element, x)))
         {
             if (!char.IsDigit(element.element) && element.element != '.')
             {
-                symbolHits[element.x,   line.y] = true;
-                symbolHits[element.x,   line.y+1] = true;
-                symbolHits[element.x,   line.y-1] = true;
-                symbolHits[element.x+1, line.y] = true;
-                symbolHits[element.x+1, line.y+1] = true;
-                symbolHits[element.x+1, line.y-1] = true;
-                symbolHits[element.x-1, line.y] = true;
-                symbolHits[element.x-1, line.y+1] = true;
-                symbolHits[element.x-1, line.y-1] = true;
+               SetHitsAroundCharacter(symbolHits, element.x, y);
             }
         }
     }
-
+    
     return symbolHits;
 }
+
+static void SetHitsAroundCharacter(bool[,] hitMatrix, int x, int y)
+{
+    for (var yOffset = -1; yOffset <= 1; yOffset++)
+        for (var xOffset = -1; xOffset <= 1; xOffset++)
+            hitMatrix[x + xOffset, y + yOffset] = true;
+}
+
+
 
 
 
