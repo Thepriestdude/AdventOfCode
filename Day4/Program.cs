@@ -42,7 +42,6 @@ IEnumerable<Scratchcard> GetAllScratchcards(string[] input)
     }
 }
 
-
 public record Scratchcard
 {
     public required int[] Numbers { get; init; } = Array.Empty<int>();
