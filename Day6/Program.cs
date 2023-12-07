@@ -5,39 +5,34 @@ var input = File.ReadAllLines("input.txt").ToArray();
 
 Console.WriteLine($"part-1 : {First(input)} : <<840336>>");
 Console.WriteLine($"part-2 : {Second(input)} : <<41382569>>");
-
+return;
 
 int First(string[] input)
 {
-    var races = CreateRaces(input);
-    return races.Aggregate(1, (current, race) => current * race.CalculateFasterTimes().Count);
+    return CreateRaces(input).Aggregate(1, (current, race) => current * race.CalculateFasterTimes().Count);
 }
 
 int Second(string[] input)
 {
-    var race = CreateRace(input);
-    return race.CalculateFasterTimes().Count;
+    return CreateRace(input).CalculateFasterTimes().Count;
 }
 
 Race CreateRace(string[] input)
 {
-    var line1 = RemoveWhiteSpace(input[0]);
-    var line2 = RemoveWhiteSpace(input[1]);
-    var times = Regex.Matches(line1, "([0-9]+)").Select(x => long.Parse(x.Value)).ToArray();
-    var recordDistances = Regex.Matches(line2, "([0-9]+)").Select(x => long.Parse(x.Value)).ToArray();
+    var times = GetNumbers(RemoveWhiteSpace(input[0]));
+    var recordDistances = GetNumbers(RemoveWhiteSpace(input[1]));
     return new Race(times[0], recordDistances[0]);
+}
+
+IEnumerable<Race> CreateRaces(string[] input)
+{
+    var times = GetNumbers(input[0]);
+    var recordDistances = GetNumbers(input[1]);
+    return times.Select((t, i) => new Race(t, recordDistances[i])).ToList();
 }
 
 string RemoveWhiteSpace(string input) => Regex.Replace(input, @"\s+", "");
 long[] GetNumbers(string input) => Regex.Matches(input, "([0-9]+)").Select(x => long.Parse(x.Value)).ToArray();
-
-List<Race> CreateRaces(string[] input)
-{
-    var times = Regex.Matches(input[0], "([0-9]+)").Select(x => int.Parse(x.Value)).ToArray();
-    var recordDistances = Regex.Matches(input[1], "([0-9]+)").Select(x => int.Parse(x.Value)).ToArray();
-    return times.Select((t, i) => new Race(t, recordDistances[i])).ToList();
-}
-
 
 record Race(long Time, long RecordDistance, long MillimetersPerMillisecond = 1)
 {
