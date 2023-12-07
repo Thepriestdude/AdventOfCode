@@ -1,0 +1,1 @@
+This can probably be solved calculating what the smallest number has to be and check if that exist in any of the ranges instead of brut forcing it.
